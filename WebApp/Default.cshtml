@@ -1,6 +1,7 @@
 ﻿@{
     Layout = "~/_Layout.cshtml";
-    Page.Title = string.Format("Razor - {0}", "Home");
+    //Page.Title = string.Format("Razor - {0}", "Home");
+    Page.Title = $"Razor - {"Home"}";
 }
 
 @section banner{<h1>@Page.Title</h1>}
@@ -8,3 +9,4 @@
 <blockquote>
     Home Page Body
 </blockquote>
+@section footer {<h4>Hey Guys</h4>}
