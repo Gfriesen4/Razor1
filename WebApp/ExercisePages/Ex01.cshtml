@@ -1,7 +1,119 @@
 ﻿@{
     Layout = "~/_Layout.cshtml";
     Page.Title = string.Format("Razor - {0}", "Exercise 01");
-   
+
+
+    string choices = "";
+    var myname = "";
+    var thebutton = "";
+    var message = "";
+    var menuMessage = "";
+    var color = "";
 }
 
 @section banner {<h1>@Page.Title</h1>}
+
+@if (!IsPost) // NO Buttons Pressed
+{
+    message = "IsPost = false";
+    color = "color:green";
+}
+else // Buttons Pressed
+{
+    //to access a control of your page use: Request.Form["control parameter name"]
+    //the data returned comes in as a STRING
+    myname = Request.Form["dataentry"];
+    thebutton = Request.Form["theButton"];
+    choices = Request.Form["group"];
+
+
+    //IF you have multiple buttons on your form, you SHOULD
+    //determine which button was pressed; thus; dictating WHICH
+    //logic is to be EXECUTED
+
+    if (thebutton.Equals("reset"))
+    {
+        myname = "";
+        message = "Reset button pressed";
+        color = "color:green";
+        menuMessage = "";
+    }
+    else if (thebutton.Equals("submit"))
+    {
+        if (string.IsNullOrEmpty(myname))
+        {
+            message = "Please enter a name ";
+            color = "color:firebrick";
+
+            if (choices.IsEmpty())
+            {
+                message += "Please make a food Selection ";
+                color = "color:firebrick";
+                choices = "";
+            }
+            else 
+            {
+                var choicesarray = choices.Split(',');
+                for (int i = 0; i < choicesarray.Length; i++)
+                {
+                    menuMessage += "Menu Items " + i + ": " + @choicesarray[i] + ". ";
+                    color = "color:green";
+                }
+                if (!string.IsNullOrEmpty(myname))
+                {
+                    menuMessage = "";
+                }
+            }
+        }
+        else
+        {
+            message = "Entered Name: " + @myname;
+            color = "color:green";
+        }
+    }
+}
+
+
+
+<form id="theform" method="post">
+    <div class="row">
+        <div class="offset-1">
+            <label id="label1" for="dataentry">Enter a Name:</label>&nbsp;&nbsp;
+            <input type="text" id="dataentry" name="dataentry" value="@myname" />
+            <br /><br />
+        </div>
+    </div>    
+        <div class="row">
+            <div class="offset-1">
+                <label id="lblMenuGroup">Menu Items:</label>
+                <input type="checkbox" id="group" name="group" value="Steak"
+                       @(Array.IndexOf(choices.Split(','), "Steak") >= 0 ? "checked" : "") />Steak<br />
+                <input type="checkbox" id="group" name="group" value="Seafood"
+                       @(Array.IndexOf(choices.Split(','), "Seafood") >= 0 ? "checked" : "") />Seafood<br />
+                <input type="checkbox" id="group" name="group" value="Vegan"
+                       @(Array.IndexOf(choices.Split(','), "Vegan") >= 0 ? "checked" : "") />Vegan<br />
+                               
+            </div>
+        </div>
+        <div class="row">
+            <div class="offset-1">
+                <button type="submit" id="theButton" name="theButton"
+                        value="submit" class="btn btn-light">
+                    Submit
+                </button>&nbsp;&nbsp;
+                <button type="submit" id="theButton" name="theButton"
+                        value="reset" class="btn btn-light">
+                    Reset
+                </button>
+            </div>
+        </div>    
+    <br />
+    <div class="row">
+        <div class="offset-1 text-center">
+            <p style=@color>
+                @message @menuMessage
+            </p>
+        </div>
+    </div>
+</form>
+
