@@ -2,9 +2,58 @@
     Layout = "~/_Layout.cshtml";
     Page.Title = string.Format("Razor - {0}", "Exercise 02 Page 02");
 
-    
+
+    var message = "";
+    var color = "";
+
+    var cid = Request.QueryString["cid"];
+
+    if (string.IsNullOrEmpty(cid))
+    {
+        Response.Redirect("Ex02P1.cshtml");
+    }
+    var db = Database.Open("CHINOOKDB");
+    var productnamequery = "SELECT Name "
+        + "FROM Artists "
+        + "WHERE ArtistID = @0";
+    var artistname = db.QuerySingle(productnamequery, cid);
+    var artistquery = "SELECT AlbumID, Title, ArtistID, ReleaseYear, ReleaseLabel "
+        + "FROM Albums "
+        + "WHERE ArtistID = @0";
+    var artistinfo = db.Query(artistquery, cid);
+    if (artistinfo == null)
+    {
+        message = "Product NOT found";
+        color = "color:firebrick";
+    }
+    var gridinstance = new WebGrid(artistinfo);
 }
 
-@section banner {
-    <h1>@Page.Title</h1>
-}
+@section banner {<h1>@Page.Title</h1>}
+
+<div class="offset-1">
+    <h3>Product Information for: @artistname.Name</h3>
+    <div class="col-11">
+        @gridinstance.GetHtml(
+            tableStyle: "table table-striped table-bordered table-hover",
+            mode: WebGridPagerModes.All,
+            firstText: "Start",
+            lastText: "End",
+            columns: gridinstance.Columns(
+                gridinstance.Column(columnName: "AlbumID", header: "Album ID"),
+                gridinstance.Column(columnName: "Title", header: "Album Title"),
+                gridinstance.Column(columnName: "ArtistID", header: "Artist ID"),
+                gridinstance.Column(columnName: "ReleaseYear", header: "Release Year"),
+                gridinstance.Column(columnName: "ReleaseLabel", header: "Release Label")))
+    </div>
+</div>
+<br />
+<div class="row">
+    <div class="col-4 text-right">
+    </div>
+    <div class="col-8 text-left">
+        <p style=@color>
+            @message
+        </p>
+    </div>
+</div>
